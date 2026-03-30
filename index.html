@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CloudCash — FinOps Autopilot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #040812;
+      --surface: #0b1120;
+      --card: #0f1a2e;
+      --accent: #00d4aa;
+      --accent2: #ff6b35;
+      --accent3: #5b8dee;
+      --text: #e8eef8;
+      --muted: #6b7d99;
+      --border: rgba(255,255,255,0.07);
+      --glow: rgba(0, 212, 170, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 60px;
+      background: rgba(4, 8, 18, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-brand span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover { color: var(--text); background: var(--border); }
+
+    .nav-links .cta {
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .nav-links .cta:hover {
+      background: #00f5c4;
+      color: #000;
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 120px 60px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid-bg {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+      top: -200px; right: -200px;
+      pointer-events: none;
+    }
+
+    .hero-glow2 {
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(91,141,238,0.07) 0%, transparent 70%);
+      bottom: -100px; left: -100px;
+      pointer-events: none;
+    }
+
+    .track-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 28px;
+      width: fit-content;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .track-badge::before { content: '●'; font-size: 8px; }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 8vw, 110px);
+      line-height: 0.95;
+      letter-spacing: 1px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease 0.1s both;
+    }
+
+    h1 .highlight { color: var(--accent); }
+    h1 .dim { color: var(--muted); }
+
+    .hero-desc {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 580px;
+      line-height: 1.7;
+      margin-bottom: 44px;
+      animation: fadeUp 0.6s ease 0.2s both;
+    }
+
+    .hero-btns {
+      display: flex; gap: 16px;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #00f5c4;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,212,170,0.3);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: var(--card);
+      transform: translateY(-2px);
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex; gap: 0;
+      margin-top: 80px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: fadeUp 0.6s ease 0.4s both;
+      background: var(--card);
+    }
+
+    .stat {
+      flex: 1;
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat .label { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    /* ── SECTION ── */
+    section { padding: 100px 60px; }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 5vw, 60px);
+      letter-spacing: 1px;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 17px;
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 60px;
+    }
+
+    /* ── PROBLEM ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .problem-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent2), transparent);
+    }
+
+    .problem-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,107,53,0.3);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .problem-card .icon {
+      font-size: 32px; margin-bottom: 16px; display: block;
+    }
+
+    .problem-card h3 {
+      font-size: 18px; font-weight: 700; margin-bottom: 10px;
+    }
+
+    .problem-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    .problem-card .metric {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 4px 12px;
+      background: rgba(255,107,53,0.1);
+      border: 1px solid rgba(255,107,53,0.2);
+      color: var(--accent2);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+    }
+
+    /* ── SOLUTION OVERVIEW ── */
+    .solution-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .solution-points { display: flex; flex-direction: column; gap: 24px; }
+
+    .solution-point {
+      display: flex; gap: 20px;
+      align-items: flex-start;
+    }
+
+    .solution-point .sp-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      color: var(--accent);
+      line-height: 1;
+      min-width: 44px;
+      opacity: 0.4;
+    }
+
+    .solution-point h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .solution-point p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ── MOCK DASHBOARD ── */
+    .dashboard-mock {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    }
+
+    .dash-header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .dash-title {
+      font-size: 12px; color: var(--muted);
+      margin-left: 8px; font-weight: 500;
+    }
+
+    .dash-body { padding: 20px; }
+
+    .dash-row { display: flex; gap: 12px; margin-bottom: 12px; }
+
+    .dash-mini-card {
+      flex: 1; background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .dash-mini-card .dmk-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .dash-mini-card .dmk-val { font-size: 20px; font-weight: 700; font-family: 'Bebas Neue', sans-serif; }
+    .dash-mini-card .dmk-val.green { color: var(--accent); }
+    .dash-mini-card .dmk-val.red { color: var(--accent2); }
+    .dash-mini-card .dmk-val.blue { color: var(--accent3); }
+    .dash-mini-card .dmk-change { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    .dash-chart-area {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .chart-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 70px; }
+
+    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+    .bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      transition: height 1s ease;
+    }
+
+    .bar-mo { font-size: 9px; color: var(--muted); }
+
+    .bar-savings {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .bs-label { font-size: 11px; color: var(--muted); }
+    .bs-val { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .bs-badge {
+      font-size: 10px; padding: 3px 8px;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      color: var(--accent);
+      border-radius: 4px; font-weight: 600;
+    }
+
+    /* ── AWS SERVICES ── */
+    .aws-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .aws-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      position: relative; overflow: hidden;
+    }
+
+    .aws-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent3), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .aws-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(91,141,238,0.3);
+    }
+
+    .aws-card:hover::after { opacity: 1; }
+
+    .aws-logo {
+      width: 44px; height: 44px;
+      background: rgba(91,141,238,0.12);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .aws-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .aws-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .aws-tag {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px; font-weight: 600;
+      color: var(--accent3);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ── WHY IT MATTERS ── */
+    .impact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .impact-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      transition: all 0.3s;
+    }
+
+    .impact-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,212,170,0.2);
+    }
+
+    .impact-card .big-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 64px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .impact-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .impact-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 100px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,212,170,0.06), transparent);
+    }
+
+    .cta-section h2 { margin-bottom: 16px; }
+    .cta-section p { color: var(--muted); font-size: 17px; margin-bottom: 40px; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    footer p { font-size: 13px; color: var(--muted); }
+
+    .footer-badge {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--muted);
+    }
+
+    .footer-badge span { color: var(--accent); font-weight: 700; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .animate-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 60px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-brand">Cloud<span>Sense</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="solution.html">How It Works</a>
+    <a href="solution.html" class="cta">See the Solution →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="track-badge">Track 2.3 — Automating Ops Workflows · FinOps</div>
+
+  <h1>
+    <span class="dim">Stop Burning</span><br>
+    Cloud<span class="highlight"> Cash.</span>
+  </h1>
+
+  <p class="hero-desc">
+    CloudCash is an AI-powered FinOps Autopilot that continuously monitors your AWS spending, detects waste in real time, and automatically acts — so you can reclaim up to 35% of your cloud budget.
+  </p>
+
+  <div class="hero-btns">
+    <a href="solution.html" class="btn btn-primary">See How It Works →</a>
+    <a href="#problem" class="btn btn-ghost">Learn the Problem</a>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="num">35%</div>
+      <div class="label">Average Cloud Spend Wasted</div>
+    </div>
+    <div class="stat">
+      <div class="num">$1M</div>
+      <div class="label">Recoverable Monthly @ Scale</div>
+    </div>
+    <div class="stat">
+      <div class="num">2min</div>
+      <div class="label">To First Optimization</div>
+    </div>
+    <div class="stat">
+      <div class="num">100%</div>
+      <div class="label">Automated Actions</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="animate-in">
+    <div class="section-tag">The Problem</div>
+    <h2>AWS Spend Is a<br>Black Box</h2>
+    <p class="section-sub">Organizations know they're overspending on cloud — but not where, not how much, and not what to do about it.</p>
+  </div>
+
+  <div class="problem-grid animate-in">
+    <div class="problem-card">
+      <span class="icon">😴</span>
+      <h3>Idle Resources Everywhere</h3>
+      <p>EC2 instances running 24/7 with under 5% CPU utilization. RDS databases nobody queries. Forgotten development environments costing thousands per month.</p>
+      <span class="metric">Up to 40% of EC2 instances are idle</span>
+    </div>
+    <div class="problem-card">
+      <span class="icon">📦</span>
+      <h3>Over-Provisioned Infrastructure</h3>
+      <p>Teams pick the "safe" instance size — always bigger than needed. No one revisits right-sizing because it's manual, slow, and not anyone's job.</p>
+      <span class="metric">Avg 3x over-provisioning rate</span>
+    </div>
+    <div class="problem-card">
+      <span class="icon">💸</span>
+      <h3>Missed Savings Plans</h3>
+      <p>Reserved instances and Savings Plans can save 40–60% over on-demand pricing — but require expertise and commitment that most teams avoid.</p>
+      <span class="metric">60% of spend never optimized</span>
+    </div>
+    <div class="problem-card">
+      <span class="icon">📊</span>
+      <h3>No One Owns FinOps</h3>
+      <p>Finance teams lack cloud knowledge. Engineering teams lack time. The result: recommendations pile up unactioned while bills keep growing.</p>
+      <span class="metric">$300K+ wasted per $1M/month</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- SOLUTION OVERVIEW -->
+<section>
+  <div class="solution-layout">
+    <div class="animate-in">
+      <div class="section-tag">Our Solution</div>
+      <h2>CloudCash<br>Autopilot</h2>
+      <p class="section-sub">Three layers of intelligence working together to continuously shrink your AWS bill.</p>
+
+      <div class="solution-points">
+        <div class="solution-point">
+          <div class="sp-num">01</div>
+          <div>
+            <h3>Monitor Everything</h3>
+            <p>Real-time ingestion from Cost Explorer, CloudWatch, and Compute Optimizer. Every resource tracked, every anomaly caught.</p>
+          </div>
+        </div>
+        <div class="solution-point">
+          <div class="sp-num">02</div>
+          <div>
+            <h3>AI-Powered Analysis</h3>
+            <p>Amazon Bedrock reasons over your spend data in natural language — finding patterns, predicting waste, and ranking opportunities by ROI.</p>
+          </div>
+        </div>
+        <div class="solution-point">
+          <div class="sp-num">03</div>
+          <div>
+            <h3>Auto-Remediate</h3>
+            <p>Stop idle instances, purchase recommended Reserved Instances, clean up unattached EBS volumes — automatically, with audit trails.</p>
+          </div>
+        </div>
+      </div>
+
+      <a href="solution.html" class="btn btn-primary" style="margin-top:40px;">Deep Dive →</a>
+    </div>
+
+    <!-- MOCK DASHBOARD -->
+    <div class="animate-in">
+      <div class="dashboard-mock">
+        <div class="dash-header">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="dash-title">CloudCash Dashboard — Live View</span>
+        </div>
+        <div class="dash-body">
+          <div class="dash-row">
+            <div class="dash-mini-card">
+              <div class="dmk-label">Monthly Spend</div>
+              <div class="dmk-val red">$84,320</div>
+              <div class="dmk-change">↑ 12% vs last month</div>
+            </div>
+            <div class="dash-mini-card">
+              <div class="dmk-label">Detected Waste</div>
+              <div class="dmk-val red">$28,160</div>
+              <div class="dmk-change">33% of total spend</div>
+            </div>
+            <div class="dash-mini-card">
+              <div class="dmk-label">AI Saved (MTD)</div>
+              <div class="dmk-val green">$14,890</div>
+              <div class="dmk-change">↓ 17% vs last month</div>
+            </div>
+          </div>
+
+          <div class="dash-chart-area">
+            <div class="chart-label">Monthly Spend vs Savings ($K)</div>
+            <div class="bar-chart" id="barChart">
+              <div class="bar-wrap">
+                <div class="bar" style="height:42px; background: rgba(91,141,238,0.5);"></div>
+                <div class="bar-mo">Aug</div>
+              </div>
+              <div class="bar-wrap">
+                <div class="bar" style="height:55px; background: rgba(91,141,238,0.5);"></div>
+                <div class="bar-mo">Sep</div>
+              </div>
+              <div class="bar-wrap">
+                <div class="bar" style="height:48px; background: rgba(91,141,238,0.5);"></div>
+                <div class="bar-mo">Oct</div>
+              </div>
+              <div class="bar-wrap">
+                <div class="bar" style="height:62px; background: rgba(91,141,238,0.5);"></div>
+                <div class="bar-mo">Nov</div>
+              </div>
+              <div class="bar-wrap">
+                <div class="bar" style="height:58px; background: rgba(91,141,238,0.5);"></div>
+                <div class="bar-mo">Dec</div>
+              </div>
+              <div class="bar-wrap">
+                <div class="bar" style="height:70px; background: rgba(255,107,53,0.6);"></div>
+                <div class="bar-mo">Jan</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-row">
+            <div class="bar-savings" style="flex:1;">
+              <span class="bs-label">EC2 Right-Sizing</span>
+              <span class="bs-val">$8,200 saved</span>
+              <span class="bs-badge">AUTO ✓</span>
+            </div>
+          </div>
+          <div class="dash-row" style="margin-top:8px;">
+            <div class="bar-savings" style="flex:1;">
+              <span class="bs-label">Reserved Instance Purchase</span>
+              <span class="bs-val">$4,100 saved</span>
+              <span class="bs-badge">AUTO ✓</span>
+            </div>
+          </div>
+          <div class="dash-row" style="margin-top:8px;">
+            <div class="bar-savings" style="flex:1; border-color: rgba(255,107,53,0.3);">
+              <span class="bs-label">Idle RDS Instances (3)</span>
+              <span class="bs-val" style="color:var(--accent2)">$2,590 pending</span>
+              <span class="bs-badge" style="color:var(--accent2); background:rgba(255,107,53,0.1); border-color:rgba(255,107,53,0.2);">PENDING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- AWS SERVICES -->
+<section>
+  <div class="animate-in">
+    <div class="section-tag">Technology</div>
+    <h2>Built on AWS</h2>
+    <p class="section-sub">Every component of CloudCash runs on purpose-built AWS services chosen for reliability, scale, and intelligence.</p>
+  </div>
+
+  <div class="aws-grid animate-in">
+    <div class="aws-card">
+      <div class="aws-logo">🧠</div>
+      <h3>Amazon Bedrock</h3>
+      <p>Powers the AI reasoning engine — analyzing spend patterns, generating natural language reports, and deciding which optimizations to apply.</p>
+      <div class="aws-tag">AI / ML Core</div>
+    </div>
+    <div class="aws-card">
+      <div class="aws-logo">📈</div>
+      <h3>AWS Cost Explorer</h3>
+      <p>Primary data source for historical spend, forecasting, and RI/SP recommendations. CloudCash polls this every 15 minutes.</p>
+      <div class="aws-tag">Data Ingestion</div>
+    </div>
+    <div class="aws-card">
+      <div class="aws-logo">⚡</div>
+      <h3>AWS Compute Optimizer</h3>
+      <p>Machine learning-driven right-sizing recommendations for EC2, Lambda, EBS, and ECS. CloudCash auto-applies approved suggestions.</p>
+      <div class="aws-tag">Optimization</div>
+    </div>
+    <div class="aws-card">
+      <div class="aws-logo">🔔</div>
+      <h3>Amazon CloudWatch</h3>
+      <p>Real-time resource utilization monitoring. Idle instance detection, traffic anomalies, and underutilized services trigger immediately.</p>
+      <div class="aws-tag">Monitoring</div>
+    </div>
+    <div class="aws-card">
+      <div class="aws-logo">⚙️</div>
+      <h3>AWS Lambda</h3>
+      <p>Serverless action layer. Every auto-remediation (stop instance, delete volume, purchase RI) executes through audited Lambda functions.</p>
+      <div class="aws-tag">Automation</div>
+    </div>
+    <div class="aws-card">
+      <div class="aws-logo">🗄️</div>
+      <h3>Amazon DynamoDB</h3>
+      <p>Stores optimization history, action logs, cost snapshots, and savings attribution data for dashboards and audit trails.</p>
+      <div class="aws-tag">Storage</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- WHY IT MATTERS -->
+<section>
+  <div class="animate-in">
+    <div class="section-tag">Impact</div>
+    <h2>Why This Matters</h2>
+    <p class="section-sub">Cloud waste is not an abstract problem. These are real dollars that could fund engineering salaries, product features, or growth.</p>
+  </div>
+
+  <div class="impact-layout animate-in">
+    <div class="impact-card">
+      <div class="big-num">$350K</div>
+      <h3>Recoverable Per Year</h3>
+      <p>For an organization spending $1M/month on AWS, CloudCash targets the 30–35% of spend that goes to idle, over-provisioned, or inefficient resources — recovered automatically.</p>
+    </div>
+    <div class="impact-card">
+      <div class="big-num">0</div>
+      <h3>Dedicated FinOps Engineers Required</h3>
+      <p>CloudCash replaces the need for a dedicated FinOps team. Engineering teams get intelligent guardrails. Finance gets real-time visibility. Everyone wins.</p>
+    </div>
+    <div class="impact-card">
+      <div class="big-num">100%</div>
+      <h3>Resource Coverage</h3>
+      <p>Unlike manual audits that sample 5–10% of resources, CloudCash watches every EC2 instance, RDS database, Lambda function, and storage bucket — continuously.</p>
+    </div>
+    <div class="impact-card">
+      <div class="big-num">2min</div>
+      <h3>From Detection to Action</h3>
+      <p>When CloudCash detects an idle resource or cost spike, it analyzes the context, generates a remediation plan, and — with pre-approval — executes it within 2 minutes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section animate-in">
+  <div class="section-tag">Ready to Dig In?</div>
+  <h2>See the Full Solution</h2>
+  <p>Explore how CloudCash works under the hood — the architecture, user flows, and interactive prototype.</p>
+  <a href="solution.html" class="btn btn-primary" style="font-size:16px; padding:16px 40px;">Explore How It Works →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+
+  <div class="footer-badge">Track <span>2.3</span> · FinOps Autopilot</div>
+</footer>
+
+<script>
+  // Scroll animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

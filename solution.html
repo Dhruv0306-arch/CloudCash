@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CloudCash — How It Works</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #040812;
+      --surface: #0b1120;
+      --card: #0f1a2e;
+      --accent: #00d4aa;
+      --accent2: #ff6b35;
+      --accent3: #5b8dee;
+      --text: #e8eef8;
+      --muted: #6b7d99;
+      --border: rgba(255,255,255,0.07);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.4;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 60px;
+      background: rgba(4, 8, 18, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px; letter-spacing: 2px;
+      color: var(--text); text-decoration: none;
+    }
+
+    .nav-brand span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 14px; padding: 8px 16px;
+      border-radius: 8px; transition: all 0.2s; font-weight: 500;
+    }
+
+    .nav-links a:hover { color: var(--text); background: var(--border); }
+
+    .nav-links .cta {
+      background: var(--accent); color: #000; font-weight: 600;
+    }
+
+    .nav-links .cta:hover { background: #00f5c4; transform: translateY(-1px); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 160px 60px 80px;
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 50% 80% at 80% 50%, rgba(91,141,238,0.07), transparent);
+    }
+
+    .page-header .section-tag {
+      display: inline-block;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+
+    .page-header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 80px);
+      line-height: 0.95; letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    .page-header p {
+      color: var(--muted); font-size: 17px;
+      max-width: 560px; line-height: 1.7;
+    }
+
+    /* ── LAYOUT ── */
+    section { padding: 80px 60px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0 60px; }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+
+    h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 4vw, 56px);
+      letter-spacing: 1px; line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .section-sub {
+      color: var(--muted); font-size: 17px;
+      max-width: 560px; line-height: 1.7;
+      margin-bottom: 60px;
+    }
+
+    .btn {
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.25s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+      border: none;
+    }
+
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover {
+      background: #00f5c4;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,212,170,0.3);
+    }
+
+    /* ── ARCHITECTURE FLOW ── */
+    .flow-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      margin-bottom: 60px;
+    }
+
+    .flow-title {
+      font-size: 14px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 40px;
+    }
+
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    .flow-step {
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      flex: 1; min-width: 120px;
+    }
+
+    .flow-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin-bottom: 14px;
+      position: relative; z-index: 1;
+    }
+
+    .flow-icon.c1 { background: rgba(91,141,238,0.15); border: 1px solid rgba(91,141,238,0.3); }
+    .flow-icon.c2 { background: rgba(0,212,170,0.12); border: 1px solid rgba(0,212,170,0.3); }
+    .flow-icon.c3 { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.3); }
+    .flow-icon.c4 { background: rgba(255,200,50,0.12); border: 1px solid rgba(255,200,50,0.3); }
+    .flow-icon.c5 { background: rgba(0,212,170,0.15); border: 1px solid rgba(0,212,170,0.4); }
+
+    .flow-step h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .flow-step p { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+    .flow-arrow {
+      font-size: 20px; color: var(--muted);
+      padding: 0 8px; flex-shrink: 0;
+      margin-bottom: 30px;
+    }
+
+    /* ── USER FLOW ── */
+    .userflow-steps {
+      display: flex; flex-direction: column; gap: 2px;
+      position: relative;
+    }
+
+    .uf-step {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .uf-num-col {
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    .uf-num {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; color: var(--accent);
+      flex-shrink: 0; z-index: 1;
+    }
+
+    .uf-line {
+      width: 2px; flex: 1; min-height: 40px;
+      background: linear-gradient(to bottom, rgba(0,212,170,0.3), rgba(0,212,170,0.05));
+      margin-top: 4px;
+    }
+
+    .uf-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      transition: all 0.3s;
+    }
+
+    .uf-content:hover {
+      border-color: rgba(0,212,170,0.2);
+      transform: translateX(4px);
+    }
+
+    .uf-content h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .uf-content p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+
+    .uf-detail {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+
+    .uf-tag {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px; font-weight: 600;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      color: var(--accent);
+    }
+
+    .uf-tag.orange {
+      background: rgba(255,107,53,0.1);
+      border-color: rgba(255,107,53,0.2);
+      color: var(--accent2);
+    }
+
+    .uf-tag.blue {
+      background: rgba(91,141,238,0.1);
+      border-color: rgba(91,141,238,0.2);
+      color: var(--accent3);
+    }
+
+    /* ── INTERACTIVE DEMO ── */
+    .demo-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .demo-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .demo-tab {
+      padding: 16px 28px;
+      font-size: 14px; font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+
+    .demo-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(0,212,170,0.05);
+    }
+
+    .demo-tab:hover:not(.active) { color: var(--text); }
+
+    .demo-panel { display: none; padding: 32px; }
+    .demo-panel.active { display: block; }
+
+    /* AI Chat Mockup */
+    .chat-area {
+      display: flex; flex-direction: column; gap: 16px;
+      max-height: 400px; overflow-y: auto;
+    }
+
+    .chat-msg {
+      display: flex; gap: 12px;
+    }
+
+    .chat-avatar {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+
+    .chat-avatar.ai { background: rgba(0,212,170,0.15); border: 1px solid rgba(0,212,170,0.3); }
+    .chat-avatar.user { background: rgba(91,141,238,0.15); border: 1px solid rgba(91,141,238,0.3); }
+
+    .chat-bubble {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 18px;
+      font-size: 14px; line-height: 1.6;
+      max-width: 85%;
+    }
+
+    .chat-bubble.ai-bubble { border-color: rgba(0,212,170,0.15); }
+
+    .chat-bubble strong { color: var(--accent); }
+
+    .savings-breakdown {
+      margin-top: 12px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+
+    .sb-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px;
+      background: var(--surface);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .sb-label { color: var(--muted); }
+    .sb-val { font-weight: 700; color: var(--accent); }
+
+    .chat-input-row {
+      display: flex; gap: 10px; margin-top: 20px;
+    }
+
+    .chat-input {
+      flex: 1; background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+    }
+
+    .chat-input:focus { border-color: var(--accent); }
+
+    .send-btn {
+      background: var(--accent); color: #000;
+      border: none; border-radius: 10px;
+      padding: 12px 20px; font-weight: 700;
+      cursor: pointer; font-family: 'Outfit', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .send-btn:hover { background: #00f5c4; }
+
+    /* Cost Table Panel */
+    .cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .cost-table th {
+      text-align: left; padding: 12px 16px;
+      font-size: 11px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cost-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cost-table tr:last-child td { border-bottom: none; }
+
+    .cost-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px; font-weight: 700;
+    }
+
+    .status-badge.idle {
+      background: rgba(255,107,53,0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(255,107,53,0.2);
+    }
+
+    .status-badge.active {
+      background: rgba(0,212,170,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0,212,170,0.2);
+    }
+
+    .status-badge.oversize {
+      background: rgba(255,200,50,0.1);
+      color: #ffc832;
+      border: 1px solid rgba(255,200,50,0.2);
+    }
+
+    .action-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 12px; border-radius: 6px;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .action-btn.stop:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    /* Wireframe Panel */
+    .wireframe-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .wf-sidebar {
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      padding: 20px;
+    }
+
+    .wf-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; color: var(--accent);
+      margin-bottom: 24px; letter-spacing: 1px;
+    }
+
+    .wf-nav-item {
+      padding: 10px 14px; border-radius: 8px;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted); margin-bottom: 4px;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .wf-nav-item.active {
+      background: rgba(0,212,170,0.1);
+      color: var(--accent);
+    }
+
+    .wf-main { padding: 20px; }
+
+    .wf-stat-row {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .wf-stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px;
+      text-align: center;
+    }
+
+    .wf-stat .ws-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px; margin-bottom: 2px;
+    }
+
+    .wf-stat .ws-label { font-size: 10px; color: var(--muted); }
+
+    .wf-bar-area {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .wf-bar-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+
+    .wf-bars { display: flex; gap: 6px; align-items: flex-end; height: 60px; }
+
+    .wf-bar {
+      flex: 1; border-radius: 3px 3px 0 0;
+    }
+
+    .wf-actions-list {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .wf-action-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .wf-ai-label { font-size: 11px; color: var(--muted); }
+    .wf-ai-badge {
+      font-size: 10px; padding: 2px 8px;
+      border-radius: 4px; font-weight: 700;
+    }
+
+    /* ── ANIMATE ── */
+    .animate-in {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .animate-in.visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    footer p { font-size: 13px; color: var(--muted); }
+
+    .footer-badge { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .footer-badge span { color: var(--accent); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand">Cloud<span>Sense</span></a>
+  <div class="nav-links">
+    <a href="index.html">← Home</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#userflow">User Flow</a>
+    <a href="#prototype">Prototype</a>
+    <a href="index.html" class="cta">Back to Landing</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="section-tag">Deep Dive</div>
+  <h1>How CloudCash<br>Actually Works</h1>
+  <p>From data ingestion to automated cost-saving actions — a complete walkthrough of the system architecture, user experience, and AWS services powering CloudCash.</p>
+</div>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="animate-in">
+    <div class="section-tag">System Architecture</div>
+    <h2>The Autopilot Loop</h2>
+    <p class="section-sub">CloudCash runs a continuous 5-step optimization loop — monitoring, analyzing, reasoning, acting, and reporting — 24 hours a day.</p>
+  </div>
+
+  <div class="flow-container animate-in">
+    <div class="flow-title">CloudCash Optimization Pipeline</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-icon c1">📥</div>
+        <h4>Ingest</h4>
+        <p>Cost Explorer + CloudWatch + Compute Optimizer APIs</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon c2">🧠</div>
+        <h4>Analyze</h4>
+        <p>Amazon Bedrock reasons over spend data in natural language</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon c3">🎯</div>
+        <h4>Prioritize</h4>
+        <p>Rank opportunities by ROI, risk, and confidence score</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon c4">⚡</div>
+        <h4>Act</h4>
+        <p>Lambda executes approved actions with full audit trail</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon c5">📊</div>
+        <h4>Report</h4>
+        <p>DynamoDB stores results. Dashboard shows savings attribution.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AWS Architecture Detail -->
+  <div class="animate-in">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px;">
+        <div style="font-size:12px; font-weight:700; color:var(--accent3); letter-spacing:1px; margin-bottom:20px;">DATA LAYER</div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(91,141,238,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">📈</div>
+            <div><div style="font-size:14px;font-weight:600;">AWS Cost Explorer API</div><div style="font-size:12px;color:var(--muted);">Historical spend, forecasts, RI recommendations</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(91,141,238,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">🔔</div>
+            <div><div style="font-size:14px;font-weight:600;">Amazon CloudWatch</div><div style="font-size:12px;color:var(--muted);">Real-time utilization metrics per resource</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(91,141,238,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">⚙️</div>
+            <div><div style="font-size:14px;font-weight:600;">AWS Compute Optimizer</div><div style="font-size:12px;color:var(--muted);">ML-based right-sizing recommendations</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(91,141,238,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">🗄️</div>
+            <div><div style="font-size:14px;font-weight:600;">Amazon DynamoDB</div><div style="font-size:12px;color:var(--muted);">Optimization history and action log storage</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px;">
+        <div style="font-size:12px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:20px;">INTELLIGENCE + ACTION LAYER</div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(0,212,170,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">🧠</div>
+            <div><div style="font-size:14px;font-weight:600;">Amazon Bedrock</div><div style="font-size:12px;color:var(--muted);">Claude model for spend analysis and NL reports</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(0,212,170,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">⚡</div>
+            <div><div style="font-size:14px;font-weight:600;">AWS Lambda</div><div style="font-size:12px;color:var(--muted);">Serverless action execution (stop, resize, purchase)</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(0,212,170,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">🕐</div>
+            <div><div style="font-size:14px;font-weight:600;">Amazon EventBridge</div><div style="font-size:12px;color:var(--muted);">Scheduled triggers every 15 minutes</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div style="width:40px;height:40px;background:rgba(0,212,170,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">🔐</div>
+            <div><div style="font-size:14px;font-weight:600;">AWS IAM + CloudTrail</div><div style="font-size:12px;color:var(--muted);">Least-privilege access, full audit trail</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- USER FLOW -->
+<section id="userflow">
+  <div class="animate-in">
+    <div class="section-tag">User Flow</div>
+    <h2>From Setup to<br>First Savings</h2>
+    <p class="section-sub">A FinOps engineer or cloud admin can get CloudCash running and seeing their first automated savings in under 10 minutes.</p>
+  </div>
+
+  <div class="userflow-steps animate-in">
+
+    <div class="uf-step">
+      <div class="uf-num-col">
+        <div class="uf-num">1</div>
+        <div class="uf-line"></div>
+      </div>
+      <div class="uf-content">
+        <h3>Connect AWS Account</h3>
+        <p>User connects their AWS account via IAM role with read + limited write permissions. CloudCash requests only what it needs — least privilege by design.</p>
+        <div class="uf-detail">
+          <span class="uf-tag blue">IAM Role Setup</span>
+          <span class="uf-tag blue">AWS Config</span>
+          <span class="uf-tag">~2 minutes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="uf-step">
+      <div class="uf-num-col">
+        <div class="uf-num">2</div>
+        <div class="uf-line"></div>
+      </div>
+      <div class="uf-content">
+        <h3>AI Scans Your Infrastructure</h3>
+        <p>Amazon Bedrock ingests 90 days of Cost Explorer data, pulls CloudWatch utilization metrics for every resource, and runs Compute Optimizer recommendations. The AI produces a prioritized list of waste.</p>
+        <div class="uf-detail">
+          <span class="uf-tag blue">Amazon Bedrock</span>
+          <span class="uf-tag blue">Cost Explorer</span>
+          <span class="uf-tag blue">CloudWatch</span>
+          <span class="uf-tag">~3 minutes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="uf-step">
+      <div class="uf-num-col">
+        <div class="uf-num">3</div>
+        <div class="uf-line"></div>
+      </div>
+      <div class="uf-content">
+        <h3>Review Recommendations Dashboard</h3>
+        <p>User sees a ranked list of opportunities — idle EC2 instances, over-provisioned RDS databases, recommended Reserved Instances — each with estimated savings and risk rating.</p>
+        <div class="uf-detail">
+          <span class="uf-tag">Interactive Dashboard</span>
+          <span class="uf-tag">Savings Estimates</span>
+          <span class="uf-tag orange">Risk Ratings</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="uf-step">
+      <div class="uf-num-col">
+        <div class="uf-num">4</div>
+        <div class="uf-line"></div>
+      </div>
+      <div class="uf-content">
+        <h3>Set Automation Rules</h3>
+        <p>User configures which action categories CloudCash can auto-execute vs. which require approval. Example: "Auto-stop EC2 idle > 7 days, ask me before purchasing Reserved Instances."</p>
+        <div class="uf-detail">
+          <span class="uf-tag">Approval Thresholds</span>
+          <span class="uf-tag blue">AWS Lambda Config</span>
+          <span class="uf-tag">Policy Builder</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="uf-step">
+      <div class="uf-num-col">
+        <div class="uf-num">5</div>
+        <div class="uf-line" style="opacity:0;"></div>
+      </div>
+      <div class="uf-content" style="border-color:rgba(0,212,170,0.3);">
+        <h3>💰 Autopilot Saves Money Continuously</h3>
+        <p>CloudCash runs every 15 minutes via EventBridge. Every action is logged to DynamoDB. Monthly savings reports are generated automatically in plain English by Amazon Bedrock and emailed to stakeholders.</p>
+        <div class="uf-detail">
+          <span class="uf-tag">EventBridge Scheduler</span>
+          <span class="uf-tag">DynamoDB Logs</span>
+          <span class="uf-tag blue">Bedrock Reports</span>
+          <span class="uf-tag orange">Email Alerts</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- PROTOTYPE / DEMO -->
+<section id="prototype">
+  <div class="animate-in">
+    <div class="section-tag">Interactive Prototype</div>
+    <h2>Try the Interface</h2>
+    <p class="section-sub">Click through the three views of CloudCash — the AI assistant, resource table, and dashboard wireframe.</p>
+  </div>
+
+  <div class="demo-wrapper animate-in">
+    <div class="demo-tabs">
+      <div class="demo-tab active" onclick="switchTab('ai')">🧠 AI Assistant</div>
+      <div class="demo-tab" onclick="switchTab('table')">📋 Resource Optimizer</div>
+      <div class="demo-tab" onclick="switchTab('wireframe')">🖼️ Dashboard View</div>
+    </div>
+
+    <!-- AI PANEL -->
+    <div class="demo-panel active" id="panel-ai">
+      <div class="chat-area" id="chatArea">
+        <div class="chat-msg">
+          <div class="chat-avatar ai">🧠</div>
+          <div class="chat-bubble ai-bubble">
+            <strong>CloudCash AI</strong> — Good morning! I've completed your monthly analysis. Here's what I found:<br><br>
+            Your AWS spend this month is <strong>$84,320</strong>. I've identified <strong>$28,160 in recoverable waste</strong> across 3 categories:
+            <div class="savings-breakdown">
+              <div class="sb-item"><span class="sb-label">🔴 Idle EC2 Instances (7)</span><span class="sb-val">$12,400/mo</span></div>
+              <div class="sb-item"><span class="sb-label">🟡 Over-provisioned RDS (3)</span><span class="sb-val">$9,200/mo</span></div>
+              <div class="sb-item"><span class="sb-label">🟠 Unattached EBS Volumes (12)</span><span class="sb-val">$6,560/mo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Ask: 'Which instances are idle?' or 'Auto-stop them all'..." onkeypress="if(event.key==='Enter')sendMsg()"/>
+        <button class="send-btn" onclick="sendMsg()">Send →</button>
+      </div>
+    </div>
+
+    <!-- TABLE PANEL -->
+    <div class="demo-panel" id="panel-table">
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Resource</th>
+            <th>Type</th>
+            <th>Region</th>
+            <th>CPU Avg</th>
+            <th>Monthly Cost</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>i-0a2b3c4d5e6 (prod-web-01)</td>
+            <td>m5.xlarge</td>
+            <td>us-east-1</td>
+            <td style="color:var(--accent2)">2.1%</td>
+            <td>$140/mo</td>
+            <td><span class="status-badge idle">IDLE</span></td>
+            <td><button class="action-btn stop" onclick="markActioned(this)">Stop</button></td>
+          </tr>
+          <tr>
+            <td>db-prod-analytics</td>
+            <td>db.r5.2xlarge</td>
+            <td>us-west-2</td>
+            <td style="color:#ffc832">8.4%</td>
+            <td>$1,200/mo</td>
+            <td><span class="status-badge oversize">OVERSIZE</span></td>
+            <td><button class="action-btn" onclick="markActioned(this)">Resize</button></td>
+          </tr>
+          <tr>
+            <td>i-0f9e8d7c6b5 (staging-api)</td>
+            <td>c5.2xlarge</td>
+            <td>ap-south-1</td>
+            <td style="color:var(--accent2)">0.8%</td>
+            <td>$280/mo</td>
+            <td><span class="status-badge idle">IDLE</span></td>
+            <td><button class="action-btn stop" onclick="markActioned(this)">Stop</button></td>
+          </tr>
+          <tr>
+            <td>i-03c7b8a2f14 (prod-batch)</td>
+            <td>m5.large</td>
+            <td>eu-west-1</td>
+            <td style="color:var(--accent)">71.2%</td>
+            <td>$72/mo</td>
+            <td><span class="status-badge active">HEALTHY</span></td>
+            <td><button class="action-btn" disabled style="opacity:0.3">N/A</button></td>
+          </tr>
+          <tr>
+            <td>db-dev-postgres-01</td>
+            <td>db.t3.medium</td>
+            <td>us-east-1</td>
+            <td style="color:var(--accent2)">1.2%</td>
+            <td>$60/mo</td>
+            <td><span class="status-badge idle">IDLE</span></td>
+            <td><button class="action-btn stop" onclick="markActioned(this)">Stop</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- WIREFRAME PANEL -->
+    <div class="demo-panel" id="panel-wireframe">
+      <div class="wireframe-grid">
+        <div class="wf-sidebar">
+          <div class="wf-logo">CloudCash</div>
+          <div class="wf-nav-item active">📊 Dashboard</div>
+          <div class="wf-nav-item">🔍 Resources</div>
+          <div class="wf-nav-item">💡 Recommendations</div>
+          <div class="wf-nav-item">⚡ Actions Log</div>
+          <div class="wf-nav-item">📋 Reports</div>
+          <div class="wf-nav-item">⚙️ Settings</div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-stat-row">
+            <div class="wf-stat">
+              <div class="ws-val" style="color:var(--accent2)">$84K</div>
+              <div class="ws-label">Month Spend</div>
+            </div>
+            <div class="wf-stat">
+              <div class="ws-val" style="color:var(--accent)">$14.8K</div>
+              <div class="ws-label">AI Saved (MTD)</div>
+            </div>
+            <div class="wf-stat">
+              <div class="ws-val" style="color:#ffc832">22</div>
+              <div class="ws-label">Open Actions</div>
+            </div>
+          </div>
+          <div class="wf-bar-area">
+            <div class="wf-bar-label">Spend by Service (Jan)</div>
+            <div class="wf-bars">
+              <div class="wf-bar" style="height:50px;background:rgba(91,141,238,0.5);"></div>
+              <div class="wf-bar" style="height:38px;background:rgba(91,141,238,0.4);"></div>
+              <div class="wf-bar" style="height:28px;background:rgba(91,141,238,0.3);"></div>
+              <div class="wf-bar" style="height:20px;background:rgba(91,141,238,0.3);"></div>
+              <div class="wf-bar" style="height:14px;background:rgba(91,141,238,0.2);"></div>
+              <div class="wf-bar" style="height:10px;background:rgba(91,141,238,0.2);"></div>
+            </div>
+          </div>
+          <div class="wf-actions-list">
+            <div class="wf-action-item">
+              <div><div style="font-size:13px;font-weight:600;">7 Idle EC2 Instances Stopped</div><div class="wf-ai-label">Auto-executed by CloudCash AI • 2h ago</div></div>
+              <div class="wf-ai-badge" style="background:rgba(0,212,170,0.1);color:var(--accent);border:1px solid rgba(0,212,170,0.2);font-size:10px;padding:3px 8px;">AUTO ✓</div>
+            </div>
+            <div class="wf-action-item">
+              <div><div style="font-size:13px;font-weight:600;">RI Purchase Recommended ($4,100/mo savings)</div><div class="wf-ai-label">Awaiting your approval • 15 min ago</div></div>
+              <div class="wf-ai-badge" style="background:rgba(255,200,50,0.1);color:#ffc832;border:1px solid rgba(255,200,50,0.2);font-size:10px;padding:3px 8px;">PENDING</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+
+  <div class="footer-badge">Track <span>2.3</span> · FinOps Autopilot · <a href="index.html" style="color:var(--accent);text-decoration:none;">← Back to Home</a></div>
+</footer>
+
+<script>
+  // Tab switching
+  function switchTab(name) {
+    document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.demo-panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  // Table action
+  function markActioned(btn) {
+    const row = btn.closest('tr');
+    const badge = row.querySelector('.status-badge');
+    badge.textContent = 'DONE ✓';
+    badge.className = 'status-badge active';
+    btn.textContent = '✓ Applied';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  }
+
+  // Simple AI chat
+  const responses = {
+    'idle': 'I found <strong>7 idle EC2 instances</strong> with under 3% average CPU over the past 14 days. Combined cost: <strong>$1,840/month</strong>. I recommend stopping them immediately.',
+    'stop': '⚡ <strong>Executing...</strong> Stopping 7 idle EC2 instances via Lambda. This will save <strong>$1,840/month</strong>. Full audit log saved to DynamoDB.',
+    'reserved': 'Based on your usage patterns, purchasing <strong>3 Reserved Instances</strong> in us-east-1 would save <strong>$4,100/month</strong> vs on-demand. 1-year, no-upfront recommended.',
+    'report': 'This month\'s summary:<br>• Total spend: <strong>$84,320</strong><br>• Waste detected: <strong>$28,160</strong><br>• Auto-saved: <strong>$14,890</strong><br>• Pending actions: 3<br><br>Detailed PDF report sent to your email.',
+    'default': 'Great question! I\'m analyzing your infrastructure now. Based on current data, your largest optimization opportunity is in EC2 right-sizing — potential savings of <strong>$12,400/month</strong>. Want me to apply those changes?'
+  };
+
+  function sendMsg() {
+    const input = document.getElementById('chatInput');
+    const val = input.value.trim();
+    if (!val) return;
+
+    const chatArea = document.getElementById('chatArea');
+
+    // User msg
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-msg';
+    userMsg.style.justifyContent = 'flex-end';
+    userMsg.innerHTML = `<div class="chat-bubble" style="background:rgba(91,141,238,0.1);border-color:rgba(91,141,238,0.2);">${val}</div><div class="chat-avatar user">👤</div>`;
+    chatArea.appendChild(userMsg);
+
+    // AI reply
+    setTimeout(() => {
+      const key = val.toLowerCase().includes('idle') ? 'idle' :
+                  val.toLowerCase().includes('stop') ? 'stop' :
+                  val.toLowerCase().includes('reserv') ? 'reserved' :
+                  val.toLowerCase().includes('report') ? 'report' : 'default';
+
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'chat-msg';
+      aiMsg.innerHTML = `<div class="chat-avatar ai">🧠</div><div class="chat-bubble ai-bubble"><strong>CloudCash AI</strong> — ${responses[key]}</div>`;
+      chatArea.appendChild(aiMsg);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }, 600);
+
+    input.value = '';
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  // Scroll animate
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
